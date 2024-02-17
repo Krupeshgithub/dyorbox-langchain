@@ -13,4 +13,4 @@ pip install -r requirements.txt -q
 
 # Start Chat Application
 chmod +x ./app.py
-./app.py
+./app.py &

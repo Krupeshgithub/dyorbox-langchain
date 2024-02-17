@@ -21,8 +21,8 @@ from langchain.prompts import PromptTemplate
 
 @dataclass
 class LangChain:
-    chunk_size: int = 450
-    chunk_overlap: int = 50
+    chunk_size: int = 120
+    chunk_overlap: int = 30
     text_contents: str = "documents/dataset.json"
     embedding = OpenAIEmbeddings()
 
@@ -62,25 +62,25 @@ class LangChain:
             self.embedding
         )
         return vectordb
-    
+
     def fetch_and_save_data(self) -> str:
         """
         This method has been fetch real time data from api
         and save into path. (`documents/datset.json`)
         """
-        url = 'https://dyorbox.io/api/projects?from=0&rows=100'
-        headers = {
-            'Accept': 'application/json, text/plain, /',
-            'If-None-Match': 'W/"24fb-XTuxcmL1X2azAlVteDJ8XwJHdjM"',
-            'Referer': 'https://dyorbox.io/projects',
-            'Sec-Fetch-Dest': 'empty',
-            'Sec-Fetch-Mode': 'cors',
-            'Sec-Fetch-Site': 'same-origin',
-            'Sec-GPC': '1',
-            'authtoken': '6ef3c9ab-c285-478a-be42-524cf5517f66',
-        }
+        url = 'https://dev.dyorbox.io/api/projects/train/chat-model'
+        # headers = {
+        #     'Accept': 'application/json, text/plain, /',
+        #     'If-None-Match': 'W/"24fb-XTuxcmL1X2azAlVteDJ8XwJHdjM"',
+        #     'Referer': 'https://dyorbox.io/projects',
+        #     'Sec-Fetch-Dest': 'empty',
+        #     'Sec-Fetch-Mode': 'cors',
+        #     'Sec-Fetch-Site': 'same-origin',
+        #     'Sec-GPC': '1',
+        #     'authtoken': '6ef3c9ab-c285-478a-be42-524cf5517f66',
+        # }
 
-        resp = requests.get(url, headers=headers)
+        resp = requests.get(url)
         if resp.status_code == 200:
             with open("documents/dataset.json", "w") as file:
                 json.dump(resp.json(), file, indent=4)
@@ -90,7 +90,7 @@ class LangChain:
 @dataclass
 class ConversationalChain(LangChain):
 
-    llm_name: str = "gpt-3.5-turbo-0301"
+    llm_name: str = "gpt-4"
     temperature: float = 0.5
     llm = ChatOpenAI(
         model_name=llm_name,

@@ -25,6 +25,7 @@ The request body includes two parameters: "question" for the question to be aske
 ```bash
 curl -i -XPOST "http://localhost:8000/ask" \
 --header "Content-Type: application/json" \
+--header "Authorization: df076c44-1018-4888-b3a7-6cd4d821e322" \
 --data '{
   "question": "How can I contact the Calette Reef Club?",
   "user_id": "001"

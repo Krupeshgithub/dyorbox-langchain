@@ -27,6 +27,10 @@ conversat = chat.conversation_retrieval_chain()
 # Api
 @app.route("/ask", methods=["POST"])
 def ask_question():
+    if request.headers.get("Authorization") != "df076c44-1018-4888-b3a7-6cd4d821e322":
+        return jsonify({
+            "answer": "Your user identity is invalid.",
+        }), 400
     req = request.get_json(silent=True)
     chat_history_count = 3
     try:
@@ -42,6 +46,7 @@ def ask_question():
         return jsonify({
             "answer": resp
         }), 200
+
 
 @app.route("/clear-user-session", methods=["POST"])
 def clear_user_session():

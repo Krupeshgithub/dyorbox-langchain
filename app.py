@@ -5,6 +5,8 @@ Inialitation project to run this module.
 from __future__ import annotations
 import os
 
+import sqlite3
+
 from flask import Flask
 from flask import jsonify
 from flask import request
@@ -24,7 +26,7 @@ conversat = chat.conversation_retrieval_chain()
 
 # Api
 @app.route("/ask", methods=["POST"])
-def post_question():
+def ask_question():
     req = request.get_json(silent=True)
     chat_history_count = 3
     try:
@@ -41,6 +43,29 @@ def post_question():
             "answer": resp
         }), 200
 
+@app.route("/clear-user-session", methods=["POST"])
+def clear_user_session():
+    conn = sqlite3.connect("sqlite.db")
+    cursor = conn.cursor()
+
+    req = request.get_json(silent=True)
+    session_id = req["user_id"]
+
+    try:
+        # Execute the DELETE statement
+        cursor.execute(f"DELETE FROM message_store WHERE session_id = ?", (session_id,))
+        # Commit the changes
+        conn.commit()
+        print(f"Entry with id {session_id} removed successfully.")
+    except sqlite3.Error as e:
+        print(f"Error removing entry with id {session_id}: {e}")
+    finally:
+        # Close the connection
+        conn.close()
+
+    return jsonify({
+        "message": "success"
+    }), 200
 
 if __name__ == '__main__':
     app.run(host="0.0.0.0", port=8000)

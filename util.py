@@ -35,8 +35,7 @@ def interval_cronjob() -> None:
     shutdown.
     """
     from chat.conversation import LangChain
-
     scheduler = BackgroundScheduler()
-    scheduler.add_job(func=LangChain().fetch_and_save_data(), trigger="interval", seconds=60)
+    scheduler.add_job(func=LangChain().fetch_and_save_data, trigger="interval", seconds=1800) # (30*60)
     scheduler.start()
     atexit.register(lambda: scheduler.shutdown())

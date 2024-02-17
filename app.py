@@ -11,17 +11,19 @@ from flask import request
 from flask_cors import CORS
 
 from chat.conversation import ConversationalChain
+from util import interval_cronjob
 
 app = Flask(__name__)
 CORS(app)
 
 # Start Chat ConversationChain
+interval_cronjob()
 chat = ConversationalChain()
 conversat = chat.conversation_retrieval_chain()
 
 
 # Api
-@app.route("/dev/question", methods=["POST"])
+@app.route("/ask", methods=["POST"])
 def post_question():
     req = request.get_json(silent=True)
     chat_history_count = 3

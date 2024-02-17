@@ -4,6 +4,8 @@ Inialize the langchain with OPENAI
 """
 from __future__ import annotations
 from typing import Any
+import requests
+import json
 
 from dataclasses import dataclass
 
@@ -21,7 +23,7 @@ from langchain.prompts import PromptTemplate
 class LangChain:
     chunk_size: int = 450
     chunk_overlap: int = 50
-    text_contents: str = "documents/test.json"
+    text_contents: str = "documents/dataset.json"
     embedding = OpenAIEmbeddings()
 
     def pdf_load(self) -> list:
@@ -32,7 +34,7 @@ class LangChain:
         loader = JSONLoader(
             file_path=self.text_contents,
             text_content=False,
-            jq_schema=".message[]"
+            jq_schema=".data[]"
         )
         docs = loader.load()
         return docs
@@ -60,6 +62,29 @@ class LangChain:
             self.embedding
         )
         return vectordb
+    
+    def fetch_and_save_data(self) -> str:
+        """
+        This method has been fetch real time data from api
+        and save into path. (`documents/datset.json`)
+        """
+        url = 'https://dyorbox.io/api/projects?from=0&rows=100'
+        headers = {
+            'Accept': 'application/json, text/plain, /',
+            'If-None-Match': 'W/"24fb-XTuxcmL1X2azAlVteDJ8XwJHdjM"',
+            'Referer': 'https://dyorbox.io/projects',
+            'Sec-Fetch-Dest': 'empty',
+            'Sec-Fetch-Mode': 'cors',
+            'Sec-Fetch-Site': 'same-origin',
+            'Sec-GPC': '1',
+            'authtoken': '6ef3c9ab-c285-478a-be42-524cf5517f66',
+        }
+
+        resp = requests.get(url, headers=headers)
+        if resp.status_code == 200:
+            with open("documents/dataset.json", "w") as file:
+                json.dump(resp.json(), file, indent=4)
+            self.embedding_and_vectorstores()
 
 
 @dataclass

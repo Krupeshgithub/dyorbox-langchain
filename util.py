@@ -8,6 +8,9 @@ from __future__ import annotations
 from typing import Union
 
 import requests
+import atexit
+from apscheduler.schedulers.background import BackgroundScheduler
+
 
 JsonType = Union["JsonType", str]
 
@@ -24,3 +27,16 @@ def ask_question_to_langchain(user_id: str, question: str) -> JsonType:
         }
     )
     return response.json()["answer"]
+
+
+def interval_cronjob() -> None:
+    """
+    This function start the cronjob and end the cronjob when the server will be
+    shutdown.
+    """
+    from chat.conversation import LangChain
+
+    scheduler = BackgroundScheduler()
+    scheduler.add_job(func=LangChain().fetch_and_save_data(), trigger="interval", seconds=60)
+    scheduler.start()
+    atexit.register(lambda: scheduler.shutdown())

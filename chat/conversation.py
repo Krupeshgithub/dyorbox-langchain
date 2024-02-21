@@ -12,6 +12,7 @@ from dataclasses import dataclass
 from langchain_community.document_loaders import JSONLoader
 from langchain_community.vectorstores import FAISS
 from langchain.text_splitter import RecursiveCharacterTextSplitter
+from langchain_community.document_loaders import PyPDFLoader
 from langchain_openai import OpenAIEmbeddings
 from langchain_openai import ChatOpenAI
 from langchain.chains import ConversationalRetrievalChain
@@ -36,7 +37,10 @@ class LangChain:
             text_content=False,
             jq_schema=".data[]"
         )
-        docs = loader.load()
+        docs_json = loader.load()
+        loader = PyPDFLoader("documents/ai_training.pdf")
+        docs_pdf = loader.load()
+        docs = docs_json + docs_pdf
         return docs
 
     def splitter(self) -> str:
@@ -68,7 +72,7 @@ class LangChain:
         This method has been fetch real time data from api
         and save into path. (`documents/datset.json`)
         """
-        url = 'https://dev.dyorbox.io/api/projects/train/chat-model'
+        url = 'https://dyorbox.io/api/projects/train/chat-model'
         # headers = {
         #     'Accept': 'application/json, text/plain, /',
         #     'If-None-Match': 'W/"24fb-XTuxcmL1X2azAlVteDJ8XwJHdjM"',
@@ -91,7 +95,7 @@ class LangChain:
 class ConversationalChain(LangChain):
 
     llm_name: str = "gpt-4"
-    temperature: float = 0.5
+    temperature: float = 0.2
     llm = ChatOpenAI(
         model_name=llm_name,
         temperature=temperature,
